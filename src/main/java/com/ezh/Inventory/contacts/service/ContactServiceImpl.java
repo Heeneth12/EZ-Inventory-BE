@@ -1,6 +1,9 @@
 package com.ezh.Inventory.contacts.service;
 
+import com.ezh.Inventory.contacts.dto.AddressDto;
 import com.ezh.Inventory.contacts.dto.ContactDto;
+import com.ezh.Inventory.contacts.dto.ContactFilter;
+import com.ezh.Inventory.contacts.entiry.Address;
 import com.ezh.Inventory.contacts.entiry.Contact;
 import com.ezh.Inventory.contacts.repository.ContactRepository;
 import com.ezh.Inventory.utils.common.CommonResponse;
@@ -9,11 +12,14 @@ import com.ezh.Inventory.utils.exception.BadRequestException;
 import com.ezh.Inventory.utils.exception.CommonException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -75,12 +81,14 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ContactDto> getAllContacts() {
-        return repository.findAll()
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+    public Page<ContactDto> getAllContacts(ContactFilter contactFilter, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        Page<Contact> contacts = repository.findAll(pageable);
+
+        return contacts.map(this::convertToDTO);
     }
+
+
 
     @Override
     @Transactional
@@ -100,20 +108,40 @@ public class ContactServiceImpl implements ContactService {
     }
 
 
-    private Contact convertToEntity(ContactDto contactDto) {
-        return Contact.builder()
-                .contactCode(contactDto.getContactCode())
-                .name(contactDto.getName())
-                .email(contactDto.getEmail())
-                .phone(contactDto.getPhone())
-                .gstNumber(contactDto.getGstNumber())
-                .type(contactDto.getType())
-                .active(contactDto.getActive() != null ? contactDto.getActive() : true) // default true
+    private Contact convertToEntity(ContactDto dto) {
+
+        Contact contact = Contact.builder()
+                .contactCode(dto.getContactCode())
+                .name(dto.getName())
+                .email(dto.getEmail())
+                .phone(dto.getPhone())
+                .gstNumber(dto.getGstNumber())
+                .type(dto.getType())
+                .active(dto.getActive() != null ? dto.getActive() : true)
                 .build();
+
+        if (dto.getAddresses() != null && !dto.getAddresses().isEmpty()) {
+            dto.getAddresses().forEach(a -> {
+                Address address = Address.builder()
+                        .type(a.getType())
+                        .addressLine1(a.getAddressLine1())
+                        .addressLine2(a.getAddressLine2())
+                        .city(a.getCity())
+                        .state(a.getState())
+                        .country(a.getCountry())
+                        .pinCode(a.getPinCode())
+                        .contact(contact)
+                        .build();
+                contact.getAddresses().add(address);
+            });
+        }
+        return contact;
     }
 
+
     private ContactDto convertToDTO(Contact contact) {
-        return ContactDto.builder()
+
+        ContactDto.ContactDtoBuilder builder = ContactDto.builder()
                 .id(contact.getId())
                 .contactCode(contact.getContactCode())
                 .name(contact.getName())
@@ -121,7 +149,27 @@ public class ContactServiceImpl implements ContactService {
                 .phone(contact.getPhone())
                 .gstNumber(contact.getGstNumber())
                 .type(contact.getType())
-                .active(contact.getActive())
-                .build();
+                .active(contact.getActive());
+
+        if (contact.getAddresses() != null && !contact.getAddresses().isEmpty()) {
+            List<AddressDto> addressDtos = contact.getAddresses()
+                    .stream()
+                    .map(a -> AddressDto.builder()
+                            .id(a.getId())
+                            .type(a.getType())
+                            .addressLine1(a.getAddressLine1())
+                            .addressLine2(a.getAddressLine2())
+                            .city(a.getCity())
+                            .state(a.getState())
+                            .country(a.getCountry())
+                            .pinCode(a.getPinCode())
+                            .build()
+                    )
+                    .toList();
+
+            builder.addresses(addressDtos);
+        }
+        return builder.build();
     }
+
 }

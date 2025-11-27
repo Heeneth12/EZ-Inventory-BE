@@ -2,12 +2,14 @@ package com.ezh.Inventory.contacts.controller;
 
 
 import com.ezh.Inventory.contacts.dto.ContactDto;
+import com.ezh.Inventory.contacts.dto.ContactFilter;
 import com.ezh.Inventory.contacts.service.ContactService;
 import com.ezh.Inventory.utils.common.CommonResponse;
 import com.ezh.Inventory.utils.common.ResponseResource;
 import com.ezh.Inventory.utils.exception.CommonException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/v1/contact")
+@CrossOrigin(origins = "*")
 @AllArgsConstructor
 public class ContactsController {
 
@@ -67,12 +70,24 @@ public class ContactsController {
         return ResponseResource.success(HttpStatus.OK, contactDto, "Contact fetched successfully");
     }
 
-//    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseResource<List<ContactDto>> getAllContacts(@RequestParam(required = false) ContactType type) {
-//        log.info("Fetching all contacts with type: {}", type);
-//        List<ContactDto> contacts = (type != null) ? contactService.getContactsByType(type) : contactService.getAllContacts();
-//        return ResponseResource.success(HttpStatus.OK, contacts, "Contacts fetched successfully");
-//    }
+    /**
+     * @Method : getAllContacts
+     * @Discriptim :
+     *
+     *
+     * @param page
+     * @param size
+     * @param contactFilter
+     * @return
+     * @throws CommonException
+     */
+    @PostMapping(path = "/all", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseResource<Page<ContactDto>> getAllContacts(@RequestParam Integer page, @RequestParam Integer size,
+                                                             @RequestBody ContactFilter contactFilter) throws CommonException{
+        log.info("Fetching all contacts with filter: {}", contactFilter);
+        Page<ContactDto> contacts = contactService.getAllContacts(contactFilter, page, size);
+        return ResponseResource.success(HttpStatus.OK, contacts, "Contacts fetched successfully");
+    }
 
     /**
      * @Method : toggleStatus
@@ -83,7 +98,7 @@ public class ContactsController {
      * @return
      * @throws CommonException
      */
-    @PatchMapping(value = "/{id}/status")
+    @PostMapping(value = "/{id}/status")
     public ResponseResource<CommonResponse> toggleStatus(@PathVariable Long id, @RequestParam Boolean active) throws CommonException {
         log.info("Toggling status of Contact {} to {}", id, active);
         CommonResponse response = contactService.toggleStatus(id, active);
