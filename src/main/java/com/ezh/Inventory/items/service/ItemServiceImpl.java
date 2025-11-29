@@ -1,6 +1,7 @@
 package com.ezh.Inventory.items.service;
 
 import com.ezh.Inventory.items.dto.ItemDto;
+import com.ezh.Inventory.items.dto.ItemFilterDto;
 import com.ezh.Inventory.items.entity.Item;
 import com.ezh.Inventory.items.repository.ItemRepository;
 import com.ezh.Inventory.utils.common.CommonResponse;
@@ -13,8 +14,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -28,7 +32,7 @@ public class ItemServiceImpl implements ItemService {
     public CommonResponse createItem(ItemDto itemDto) throws CommonException {
         log.info("Creating new item: {}", itemDto);
         if (itemRepository.existsByItemCode(itemDto.getItemCode())) {
-            throw new BadRequestException("Item Code already exists");
+            throw new CommonException("Item Code already exists", HttpStatus.BAD_REQUEST);
         }
         Item item = convertToEntity(itemDto);
         itemRepository.save(item);
@@ -106,6 +110,17 @@ public class ItemServiceImpl implements ItemService {
                 .message(active ? "ITEM_ACTIVATED" : "ITEM_DEACTIVATED")
                 .status(Status.SUCCESS)
                 .build();
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ItemDto> itemSearch(ItemFilterDto itemFilter) throws CommonException {
+        List<Item> items = itemRepository.smartSearch(itemFilter.getSearchQuery());
+
+        return items.stream()
+                .map(this::convertToDto)
+                .toList();
     }
 
 

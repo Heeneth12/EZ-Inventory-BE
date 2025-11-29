@@ -1,6 +1,7 @@
 package com.ezh.Inventory.items.controller;
 
 import com.ezh.Inventory.items.dto.ItemDto;
+import com.ezh.Inventory.items.dto.ItemFilterDto;
 import com.ezh.Inventory.items.service.ItemService;
 import com.ezh.Inventory.utils.common.CommonResponse;
 import com.ezh.Inventory.utils.common.ResponseResource;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -42,7 +45,6 @@ public class ItemController {
         return ResponseResource.success(HttpStatus.OK, response, "ITEM DETAILS FETCHED");
     }
 
-
     @PostMapping(value = "/{id}/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseResource<CommonResponse> updateItem(@PathVariable Long id, @RequestBody ItemDto itemDto) throws CommonException {
         log.info("Updating item with ID: {}", id);
@@ -57,11 +59,10 @@ public class ItemController {
         return ResponseResource.success(HttpStatus.OK, response, "ITEM TOGGLED SUCCESSFULLY");
     }
 
-
-//    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> searchItems(@RequestParam("query") String query) {
-//        log.info("Searching items by query: {}", query);
-//        List<ItemResponse> results = itemService.search(query);
-//        return ResponseResource.success(HttpStatus.OK, results, "SEARCH RESULTS");
-//    }
+    @PostMapping(value = "/search",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseResource<List<ItemDto>> searchItems(@RequestBody ItemFilterDto itemFilter) {
+        log.info("Searching items by query: {}", itemFilter);
+        List<ItemDto> response = itemService.itemSearch(itemFilter);
+        return ResponseResource.success(HttpStatus.OK, response, "SEARCH RESULTS");
+    }
 }
