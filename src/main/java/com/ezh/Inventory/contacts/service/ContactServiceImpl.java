@@ -82,9 +82,18 @@ public class ContactServiceImpl implements ContactService {
     @Override
     @Transactional(readOnly = true)
     public Page<ContactDto> getAllContacts(ContactFilter contactFilter, Integer page, Integer size) {
+        log.info("get all");
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        Page<Contact> contacts = repository.findAll(pageable);
-
+        Page<Contact> contacts = repository.searchContacts(
+                contactFilter.getSearchQuery(),
+                contactFilter.getName(),
+                contactFilter.getEmail(),
+                contactFilter.getPhone(),
+                contactFilter.getGstNumber(),
+                contactFilter.getType(),
+                contactFilter.getActive(),
+                pageable
+        );
         return contacts.map(this::convertToDTO);
     }
 
