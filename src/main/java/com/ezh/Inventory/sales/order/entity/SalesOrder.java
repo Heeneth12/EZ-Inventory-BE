@@ -19,6 +19,9 @@ import java.util.List;
 @Builder
 public class SalesOrder extends CommonSerializable {
 
+    @Column(name = "tenant_id", nullable = false)
+    private Long tenantId;
+
     @Column(name = "order_number", nullable = false, unique = true, length = 40)
     private String orderNumber;  // SO-2025-0001
 

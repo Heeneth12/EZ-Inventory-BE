@@ -1,10 +1,10 @@
 package com.ezh.Inventory.stock.entity;
 
 import com.ezh.Inventory.utils.common.CommonSerializable;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "stock_ledger")
@@ -18,19 +18,24 @@ public class StockLedger extends CommonSerializable {
     @Column(name = "item_id", nullable = false)
     private Long itemId;
 
+    @Column(name = "tenant_id", nullable = false)
+    private Long tenantId;
+
     @Column(name = "warehouse_id", nullable = false)
     private Long warehouseId;
 
-    @Column(name = "transaction_type", nullable = false) // IN / OUT / ADJUST
-    private String transactionType;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transaction_type", nullable = false) // IN / OUT
+    private MovementType transactionType;
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "reference_type") // GRN / SALE / TRANSFER / RETURN
-    private String referenceType;
+    private ReferenceType referenceType;
 
-    @Column(name = "reference_id")
+    @Column(name = "reference_id")  //GRN_ID / SALE_ID ...
     private Long referenceId;
 
     @Column(name = "before_qty", nullable = false)
@@ -38,4 +43,10 @@ public class StockLedger extends CommonSerializable {
 
     @Column(name = "after_qty", nullable = false)
     private Integer afterQty;
+
+    @Column(name = "unit_price", precision = 18, scale = 2)
+    private BigDecimal unitPrice; // Price per item (Purchase price or Selling price)
+
+    @Column(name = "total_value", precision = 18, scale = 2)
+    private BigDecimal totalValue; // quantity * unit_price
 }

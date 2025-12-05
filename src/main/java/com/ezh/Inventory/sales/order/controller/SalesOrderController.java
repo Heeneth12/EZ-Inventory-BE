@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/v1/sales/order")
-@CrossOrigin(origins = "*")
 @AllArgsConstructor
 public class SalesOrderController {
 

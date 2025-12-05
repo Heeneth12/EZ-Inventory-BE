@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.ezh.Inventory.utils.UserContextUtil.getTenantIdOrThrow;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -67,7 +69,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
     public CommonResponse updateSalesOrder(Long id, SalesOrderCreateDto salesOrderCreateDto) throws CommonException {
         log.info("Updating Sales Order id: {}", id);
 
-        SalesOrder salesOrder = salesOrderRepository.findById(id)
+        SalesOrder salesOrder = salesOrderRepository.findByIdAndTenantId(id, getTenantIdOrThrow())
                 .orElseThrow(() -> new BadRequestException("Sales Order not found"));
 
         mapDtoToEntity(salesOrderCreateDto, salesOrder, null);
@@ -92,7 +94,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
     public SalesOrderDto getSalesOrder(Long id) throws CommonException {
         log.info("Fetching Sales Order id: {}", id);
 
-        SalesOrder salesOrder = salesOrderRepository.findById(id)
+        SalesOrder salesOrder = salesOrderRepository.findByIdAndTenantId(id, getTenantIdOrThrow())
                 .orElseThrow(() -> new BadRequestException("Sales Order not found"));
 
         return convertToDto(salesOrder);
@@ -107,6 +109,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
         salesOrder.setOrderNumber(dto.getOrderNumber());
         salesOrder.setOrderDate(dto.getOrderDate());
         salesOrder.setRemarks(dto.getRemarks());
+        salesOrder.setTenantId(getTenantIdOrThrow());
 
         if (status != null) {
             salesOrder.setStatus(status);
@@ -198,6 +201,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 
         return SalesOrderDto.builder()
                 .id(entity.getId())
+                .tenantId(entity.getTenantId())
                 .orderNumber(entity.getOrderNumber())
                 .orderDate(entity.getOrderDate())
                 .remarks(entity.getRemarks())

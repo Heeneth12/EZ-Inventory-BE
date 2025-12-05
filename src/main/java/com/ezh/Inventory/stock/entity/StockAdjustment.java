@@ -17,11 +17,15 @@ public class StockAdjustment extends CommonSerializable {
     @Column(name = "item_id", nullable = false)
     private Long itemId;
 
+    @Column(name = "tenant_id", nullable = false)
+    private Long tenantId;
+
     @Column(name = "warehouse_id", nullable = false)
     private Long warehouseId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "reason_type", nullable = false)
-    private String reasonType;
+    private AdjustmentType reasonType;
     // Examples: DAMAGE, EXPIRED, AUDIT_CORRECTION, FOUND_EXTRA, LOST, SPILLAGE
 
     @Column(name = "notes")
