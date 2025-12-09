@@ -129,6 +129,19 @@ public class SalesOrderServiceImpl implements SalesOrderService {
         return result.map(this::mapToDto);
     }
 
+    public List<SalesOrderDto> getAllSalesOrders(SalesOrderFilter filter) throws CommonException{
+        Long tenantId = UserContextUtil.getTenantIdOrThrow();
+        List<SalesOrder> orders = salesOrderRepository.getAllSalesOrders(
+                tenantId,
+                filter.getId(),
+                filter.getStatus(),
+                filter.getCustomerId(),
+                filter.getWarehouseId()
+        );
+        return orders.stream().map(this::mapToDto).toList();
+
+    }
+
     @Override
     @Transactional
     public CommonResponse cancelSalesOrder(Long id) throws CommonException {

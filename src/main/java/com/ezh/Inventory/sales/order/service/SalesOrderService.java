@@ -6,6 +6,8 @@ import com.ezh.Inventory.utils.common.CommonResponse;
 import com.ezh.Inventory.utils.exception.CommonException;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface SalesOrderService {
 
     CommonResponse createSalesOrder(SalesOrderDto dto) throws CommonException;
@@ -13,5 +15,6 @@ public interface SalesOrderService {
     SalesOrderDto getSalesOrderById(Long id) throws CommonException;
     CommonResponse cancelSalesOrder(Long id) throws CommonException;
     Page<SalesOrderDto> getAllSalesOrders(SalesOrderFilter filter, int page, int size) throws CommonException;
+    List<SalesOrderDto> getAllSalesOrders(SalesOrderFilter filter) throws CommonException;
 
 }

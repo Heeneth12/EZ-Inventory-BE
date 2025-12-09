@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -21,8 +22,10 @@ public class InvoiceDto {
     private Long salesOrderId;
     private SalesOrderDto salesOrderDto;
     private Long customerId;
+    private String customerName;
     private ContactDto customer;
     private InvoiceStatus status;
+    private Date invoiceDate;
     private List<InvoiceItemDto> items;
     private BigDecimal subTotal; // qty × price (sum of all line totals before tax)
     private BigDecimal discountAmount; // optional (invoice level)

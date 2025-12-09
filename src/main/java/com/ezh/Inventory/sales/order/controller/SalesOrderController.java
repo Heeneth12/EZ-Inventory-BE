@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/v1/sales/order")
@@ -47,6 +49,13 @@ public class SalesOrderController {
                                                                    @RequestBody SalesOrderFilter filter) throws CommonException {
         log.info("Fetching All Sales Orders, page: {}, size: {}", page, size);
         Page<SalesOrderDto> response = salesOrderService.getAllSalesOrders(filter, page, size);
+        return ResponseResource.success(HttpStatus.OK, response, "Sales Orders Fetched Successfully");
+    }
+
+    @PostMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseResource<List<SalesOrderDto>> searchSalesOrders(@RequestBody SalesOrderFilter filter) throws CommonException {
+        log.info("Fetching Sales Orders using filters with: {}", filter);
+        List<SalesOrderDto> response = salesOrderService.getAllSalesOrders(filter);
         return ResponseResource.success(HttpStatus.OK, response, "Sales Orders Fetched Successfully");
     }
 

@@ -1,11 +1,15 @@
 package com.ezh.Inventory.sales.invoice.service;
 
+import com.ezh.Inventory.sales.invoice.dto.InvoiceCreateDto;
 import com.ezh.Inventory.sales.invoice.dto.InvoiceDto;
 import com.ezh.Inventory.utils.common.CommonResponse;
 import com.ezh.Inventory.utils.exception.CommonException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface InvoiceService {
 
-   CommonResponse createInvoice(InvoiceDto invoiceDto) throws CommonException;
+   CommonResponse createInvoice(InvoiceCreateDto dto) throws CommonException;
    InvoiceDto getInvoiceById(Long invoiceId) throws CommonException;
+   Page<InvoiceDto> getAllInvoices(Integer page, Integer size) throws CommonException;
 }

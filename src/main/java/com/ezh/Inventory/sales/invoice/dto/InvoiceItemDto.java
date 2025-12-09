@@ -18,6 +18,8 @@ public class InvoiceItemDto {
     private Long itemId;
     private String itemName;
     private Integer quantity;
+    private  String batchNumber;
+    private String sku;
     private BigDecimal unitPrice;
     private BigDecimal discountAmount; // optional per item
     private BigDecimal taxAmount; // tax per item
