@@ -1,0 +1,71 @@
+package com.ezh.Inventory.sales.delivery.entity;
+
+import com.ezh.Inventory.contacts.entiry.Contact;
+import com.ezh.Inventory.employee.entity.Employee;
+import com.ezh.Inventory.sales.invoice.entity.Invoice;
+import com.ezh.Inventory.utils.common.CommonSerializable;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+
+@Entity
+@Table(name = "delivery")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Delivery extends CommonSerializable {
+
+    @Column(name = "tenant_id", nullable = false)
+    private Long tenantId;
+
+    @Column(name = "delivery_number", unique = true, nullable = false)
+    private String deliveryNumber;  // DEV-2025-001
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "invoice_id", nullable = false)
+    private Invoice invoice;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Contact customer;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private ShipmentType type;   // PICKUP / COURIER / OWN_FLEET
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private ShipmentStatus status; // PENDING, SCHEDULED, SHIPPED, DELIVERED
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delivery_person_id", nullable = true)
+    private Employee deliveryPerson;
+
+    @Column(name = "scheduled_date", nullable = false)
+    private Date scheduledDate;
+
+    @Column(name = "shipped_date", nullable = false)
+    private Date shippedDate;
+
+    @Column(name = "delivered _date", nullable = false)
+    private Date deliveredDate;
+
+    @Column(name = "delivery_address", length = 500)
+    private String deliveryAddress;
+
+    @Column(name = "contact_person", length = 100)
+    private String contactPerson;
+
+    @Column(name = "contact_phone", length = 20)
+    private String contactPhone;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "delivery", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DeliveryItem> items = new ArrayList<>();
+}

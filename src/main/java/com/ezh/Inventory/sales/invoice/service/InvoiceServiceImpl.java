@@ -4,6 +4,7 @@ import com.ezh.Inventory.contacts.entiry.Contact;
 import com.ezh.Inventory.contacts.repository.ContactRepository;
 import com.ezh.Inventory.items.entity.Item;
 import com.ezh.Inventory.items.repository.ItemRepository;
+import com.ezh.Inventory.sales.delivery.service.DeliveryService;
 import com.ezh.Inventory.sales.invoice.dto.InvoiceCreateDto;
 import com.ezh.Inventory.sales.invoice.dto.InvoiceDto;
 import com.ezh.Inventory.sales.invoice.dto.InvoiceItemCreateDto;
@@ -55,6 +56,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final ItemRepository itemRepository;
     private final ContactRepository contactRepository;
     private final StockService stockService;
+    private final DeliveryService deliveryService;
 
 
     @Override
@@ -160,8 +162,13 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         // E. Finalize Invoice Header
         invoice.setSubTotal(subTotal);
-        invoice.setGrandTotal(subTotal.subtract(invoice.getDiscountAmount()).add(totalTax));
+        BigDecimal grandTotal = subTotal.subtract(invoice.getDiscountAmount());
+        invoice.setGrandTotal(grandTotal);
+        invoice.setBalance(grandTotal); // Balance is full amount initially
         invoiceRepository.save(invoice);
+
+        //TRIGGER DELIVERY LOGIC
+        deliveryService.createDeliveryForInvoice(invoice, dto);
 
         // F. Update Sales Order Status
         updateSalesOrderStatus(salesOrder);
@@ -216,7 +223,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         salesOrderRepository.save(salesOrder);
     }
 
-    private InvoiceDto mapToDto(Invoice invoice) {
+    public InvoiceDto mapToDto(Invoice invoice) {
         List<InvoiceItemDto> itemDtos = invoice.getItems().stream()
                 .map(item -> InvoiceItemDto.builder()
                         .id(item.getId())
