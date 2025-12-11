@@ -42,6 +42,10 @@ public class SalesOrderItem extends CommonSerializable {
     @Column(name = "discount")
     private BigDecimal discount = BigDecimal.ZERO;
 
+    @Builder.Default
+    @Column(name = "tax")
+    private BigDecimal tax = BigDecimal.ZERO;
+
     @Column(name = "line_total", nullable = false)
     private BigDecimal lineTotal;  // (unit_price * qty) − discountAmount
 }

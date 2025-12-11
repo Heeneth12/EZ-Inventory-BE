@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,13 +56,23 @@ public class SalesOrderServiceImpl implements SalesOrderService {
                 .orderDate(new Date())
                 .status(SalesOrderStatus.CREATED)
                 .remarks(dto.getRemarks())
+                .items(new ArrayList<>())
                 .build();
 
+        // 2. Process Items & Apply Logic (Modularized)
+        processOrderItems(salesOrder, dto.getItems());
+
+        // 3. Apply Header Level Flat Discounts/Tax & Finalize Totals
+        applyHeaderTotals(salesOrder, dto);
+
+        // 4. Save
+        salesOrderRepository.save(salesOrder);
+
         // 2. Process Items & Calculate Totals
-        processItemsAndTotals(salesOrder, dto.getItems());
+        //processItemsAndTotals(salesOrder, dto.getItems());
 
         // 3. Save (Cascade saves items automatically)
-        salesOrderRepository.save(salesOrder);
+        //salesOrderRepository.save(salesOrder);
 
         return CommonResponse.builder()
                 .id(salesOrder.getId().toString())
@@ -230,6 +241,86 @@ public class SalesOrderServiceImpl implements SalesOrderService {
         salesOrder.setGrandTotal(subTotal.subtract(totalDiscount).add(totalTax));
     }
 
+
+    private void processOrderItems(SalesOrder salesOrder, List<SalesOrderItemDto> itemDtos) {
+        if (itemDtos == null || itemDtos.isEmpty()) return;
+
+        for (SalesOrderItemDto itemDto : itemDtos) {
+            Item itemMaster = itemRepository.findById(itemDto.getItemId())
+                    .orElseThrow(() -> new CommonException("Item ID " + itemDto.getItemId() + " not found", HttpStatus.BAD_REQUEST));
+
+            SalesOrderItem soItem = calculateAndMapItem(salesOrder, itemDto, itemMaster);
+            salesOrder.getItems().add(soItem);
+        }
+    }
+
+    private SalesOrderItem calculateAndMapItem(SalesOrder salesOrder, SalesOrderItemDto dto, Item master) {
+        // 1. Determine Base Values
+        BigDecimal quantity = BigDecimal.valueOf(dto.getOrderedQty());
+        BigDecimal price = dto.getUnitPrice() != null ? dto.getUnitPrice() : master.getSellingPrice();
+
+        // 2. Item Level Adjustments
+        BigDecimal itemDiscount = dto.getDiscount() != null ? dto.getDiscount() : BigDecimal.ZERO;
+        BigDecimal itemTax = dto.getTax() != null ? dto.getTax() : BigDecimal.ZERO;
+
+        // 3. Calculate Line Total (Net value for this specific row)
+        // Formula: (Price * Qty) - Discount + Tax
+        BigDecimal grossPrice = price.multiply(quantity);
+        BigDecimal lineTotal = grossPrice.subtract(itemDiscount).add(itemTax);
+
+        // 4. Map Entity
+        return SalesOrderItem.builder()
+                .salesOrder(salesOrder)
+                .itemId(master.getId())
+                .itemName(master.getName())
+                .orderedQty(dto.getOrderedQty())
+                .quantity(0)
+                .invoicedQty(0)
+                .unitPrice(price)
+                .discount(itemDiscount)
+                .tax(itemTax)
+                .lineTotal(lineTotal)
+                .build();
+    }
+
+
+    private void applyHeaderTotals(SalesOrder salesOrder, SalesOrderDto dto) {
+
+        // A. Initialize Accumulators
+        BigDecimal sumGrossAmount = BigDecimal.ZERO; // Pure (Price * Qty)
+        BigDecimal sumItemDiscounts = BigDecimal.ZERO;
+        BigDecimal sumItemTaxes = BigDecimal.ZERO;
+
+        // B. Loop processed items to sum up values
+        for (SalesOrderItem item : salesOrder.getItems()) {
+            BigDecimal itemGross = item.getUnitPrice().multiply(BigDecimal.valueOf(item.getOrderedQty()));
+            sumGrossAmount = sumGrossAmount.add(itemGross);
+
+            sumItemDiscounts = sumItemDiscounts.add(item.getDiscount());
+            sumItemTaxes = sumItemTaxes.add(item.getTax());
+        }
+
+        // C. Get Header Level Flat Inputs (The "Global" adjustments)
+        BigDecimal headerFlatDiscount = dto.getTotalDiscount() != null ? dto.getTotalDiscount() : BigDecimal.ZERO;
+        BigDecimal headerFlatTax = dto.getTotalTax() != null ? dto.getTotalTax() : BigDecimal.ZERO;
+
+        // D. Calculate Final Header Fields
+        // 1. Total Discount = (Sum of Item Discounts) + (Flat Header Discount)
+        BigDecimal finalTotalDiscount = sumItemDiscounts.add(headerFlatDiscount);
+
+        // 2. Total Tax = (Sum of Item Taxes) + (Flat Header Tax)
+        BigDecimal finalTotalTax = sumItemTaxes.add(headerFlatTax);
+
+        // 3. Set Values
+        salesOrder.setSubTotal(sumGrossAmount); // Gross value before any math
+        salesOrder.setTotalDiscount(finalTotalDiscount);
+        salesOrder.setTotalTax(finalTotalTax);
+
+        // 4. Grand Total = SubTotal - TotalDiscount + TotalTax
+        BigDecimal grandTotal = sumGrossAmount.subtract(finalTotalDiscount).add(finalTotalTax);
+        salesOrder.setGrandTotal(grandTotal.max(BigDecimal.ZERO));
+    }
+
     private SalesOrderDto mapToDto(SalesOrder so) {
         List<SalesOrderItemDto> itemDtos = new ArrayList<>();
 
@@ -243,6 +334,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
                         .invoicedQty(item.getInvoicedQty())
                         .unitPrice(item.getUnitPrice())
                         .discount(item.getDiscount())
+                        .tax(item.getTax())
                         .lineTotal(item.getLineTotal())
                         .build()
                 );
@@ -261,6 +353,13 @@ public class SalesOrderServiceImpl implements SalesOrderService {
                 .subTotal(so.getSubTotal())
                 .totalDiscount(so.getTotalDiscount())
                 .totalTax(so.getTotalTax())
+                .totalDiscountPer(
+                        so.getSubTotal().compareTo(BigDecimal.ZERO) > 0
+                                ? so.getTotalDiscount()
+                                .multiply(BigDecimal.valueOf(100))
+                                .divide(so.getSubTotal(), 2, RoundingMode.HALF_UP)
+                                : BigDecimal.ZERO
+                )
                 .grandTotal(so.getGrandTotal())
                 .items(itemDtos)
                 .build();
