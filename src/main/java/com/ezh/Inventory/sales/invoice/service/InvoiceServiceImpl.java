@@ -189,18 +189,27 @@ public class InvoiceServiceImpl implements InvoiceService {
             validateItemBelongsToOrder(soItem, invoice.getSalesOrder());
             validateRemainingQuantity(soItem, itemDto.getQuantity());
 
-            // 2. Fetch Master Data (Snapshot)
+            // 2. Fetch Master Data
             Item itemMaster = itemRepository.findById(itemDto.getItemId())
                     .orElseThrow(() -> new CommonException("Item Master not found", HttpStatus.NOT_FOUND));
 
-            // 3. Calculate Item Financials
+            // 3. CALL STOCK DEDUCTION (This updates DB and returns the used Batch)
+            String allocatedBatchNumber = deductStock(invoice, itemDto);
+
+            // 4. Update DTO so calculateAndMapItem uses the correct batch
+            itemDto.setBatchNumber(allocatedBatchNumber);
+
+            // 5. Build Item
             InvoiceItem invoiceItem = calculateAndMapItem(invoice, itemDto, soItem, itemMaster);
+
+            // Double ensure the entity gets the batch
+            invoiceItem.setBatchNumber(allocatedBatchNumber);
+
             invoice.getItems().add(invoiceItem);
 
-            //STOCK DEDUCTION (Movement: OUT)
-            deductStock(invoice, itemDto);
+            // REMOVED THE SECOND deductStock CALL HERE (It was causing double deduction)
 
-            // 5. Update Progress on Sales Order
+            // 6. Update Progress on Sales Order
             soItem.setInvoicedQty(soItem.getInvoicedQty() + itemDto.getQuantity());
             salesOrderItemRepository.save(soItem);
         }
@@ -411,7 +420,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         return savedSo;
     }
 
-    private void deductStock(Invoice invoice, InvoiceItemCreateDto dto) {
+    private String deductStock(Invoice invoice, InvoiceItemCreateDto dto) {
         StockUpdateDto stockUpdate = StockUpdateDto.builder()
                 .itemId(dto.getItemId())
                 .warehouseId(invoice.getWarehouseId())
@@ -421,7 +430,18 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .referenceId(invoice.getId())
                 .batchNumber(dto.getBatchNumber())
                 .build();
-        stockService.updateStock(stockUpdate);
+
+        // Ensure your StockService returns CommonResponse<String> or Object
+        CommonResponse response = stockService.updateStock(stockUpdate);
+
+        // Now this will work because we added the 'data' field
+        if (response.getData() != null) {
+            return response.getData().toString();
+        }
+
+        // Fallback: If stock service didn't return a specific batch (e.g., non-batch item),
+        // use what was requested.
+        return dto.getBatchNumber();
     }
 
     private void updateSalesOrderStatus(SalesOrder salesOrder) {

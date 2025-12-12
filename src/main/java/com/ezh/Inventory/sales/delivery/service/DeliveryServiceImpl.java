@@ -71,6 +71,8 @@ public class DeliveryServiceImpl implements DeliveryService {
             initialStatus = ShipmentStatus.PENDING; // Goes to "Todo List"
             // If user provided a specific date, use it, else default to today
             scheduledDate = dto.getScheduledDate();
+            deliveredDate = new Date();
+            scheduledDate = new Date();
 
         }
 

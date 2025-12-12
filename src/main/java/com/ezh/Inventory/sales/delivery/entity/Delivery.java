@@ -47,13 +47,13 @@ public class Delivery extends CommonSerializable {
     @JoinColumn(name = "delivery_person_id", nullable = true)
     private Employee deliveryPerson;
 
-    @Column(name = "scheduled_date", nullable = false)
+    @Column(name = "scheduled_date")
     private Date scheduledDate;
 
-    @Column(name = "shipped_date", nullable = true)
+    @Column(name = "shipped_date")
     private Date shippedDate;
 
-    @Column(name = "delivered _date", nullable = true)
+    @Column(name = "delivered _date")
     private Date deliveredDate;
 
     @Column(name = "delivery_address", length = 500)

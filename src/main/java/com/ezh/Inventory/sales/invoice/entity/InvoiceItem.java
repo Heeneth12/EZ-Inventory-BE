@@ -50,6 +50,9 @@ public class InvoiceItem extends CommonSerializable {
     @Column(name = "discount_amount")
     private BigDecimal discountAmount = BigDecimal.ZERO; // optional per item
 
+    @Column(name = "returned_quantity")
+    private Integer returnedQuantity = 0;
+
     @Builder.Default
     @Column(name = "tax_amount")
     private BigDecimal taxAmount = BigDecimal.ZERO; // tax per item

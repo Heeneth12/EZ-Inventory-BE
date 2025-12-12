@@ -4,6 +4,7 @@ package com.ezh.Inventory.sales.delivery.controller;
 import com.ezh.Inventory.sales.delivery.dto.DeliveryDto;
 import com.ezh.Inventory.sales.delivery.dto.DeliveryFilterDto;
 import com.ezh.Inventory.sales.delivery.service.DeliveryService;
+import com.ezh.Inventory.utils.common.CommonResponse;
 import com.ezh.Inventory.utils.common.ResponseResource;
 import com.ezh.Inventory.utils.exception.CommonException;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,13 @@ public class DeliveryController {
         log.info("Fetching all deliveries with page: {} and size: {}", page, size);
         Page<DeliveryDto> response = deliveryService.getAllDeliveries(page, size);
         return ResponseResource.success(HttpStatus.OK, response, "Deliveries fetched successfully");
+    }
+
+    @PostMapping(value = "/{deliveryId}/delivered", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseResource<CommonResponse> markAsDelivered(@PathVariable Long deliveryId) throws CommonException {
+        log.info("Marking delivery {} as delivered", deliveryId);
+        CommonResponse response = deliveryService.markAsDelivered(deliveryId);
+        return ResponseResource.success(HttpStatus.OK, response, "Delivery marked as delivered successfully");
     }
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
