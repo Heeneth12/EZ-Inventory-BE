@@ -39,6 +39,16 @@ public class Payment extends CommonSerializable {
     @Column(name = "status", nullable = false, length = 20)
     private PaymentStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method", nullable = false)
+    private PaymentMethod paymentMethod;
+
+    @Column(name = "reference_number")
+    private String referenceNumber; // Cheque No / Transaction ID
+
+    @Column(name = "bank_name")
+    private String bankName;
+
     @Column(name = "remarks", length = 500)
     private String remarks;
 

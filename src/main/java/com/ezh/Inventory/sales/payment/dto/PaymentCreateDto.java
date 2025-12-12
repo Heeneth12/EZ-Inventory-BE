@@ -4,7 +4,7 @@ import com.ezh.Inventory.sales.payment.entity.PaymentMethod;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -12,10 +12,11 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentCreateDto {
-    private Long invoiceId;
-    private BigDecimal amount;
-    private PaymentMethod paymentMode;
+    private Long customerId;
+    private BigDecimal totalAmount;
+    private PaymentMethod paymentMethod;
     private String referenceNumber;
-    private Date paymentDate;
     private String remarks;
+    // Optional:Empty list = Advance Payment
+    private List<PaymentAllocationDto> allocations;
 }
