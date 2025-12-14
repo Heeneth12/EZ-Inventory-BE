@@ -1,5 +1,6 @@
 package com.ezh.Inventory.sales.order.service;
 
+import com.ezh.Inventory.contacts.dto.ContactMiniDto;
 import com.ezh.Inventory.contacts.entiry.Contact;
 import com.ezh.Inventory.contacts.repository.ContactRepository;
 import com.ezh.Inventory.items.entity.Item;
@@ -345,6 +346,13 @@ public class SalesOrderServiceImpl implements SalesOrderService {
             }
         }
 
+        ContactMiniDto contactMiniDto = ContactMiniDto
+                .builder()
+                .id(so.getCustomer().getId())
+                .contactCode(so.getCustomer().getContactCode())
+                .name(so.getCustomer().getName())
+                .build();
+
         return SalesOrderDto.builder()
                 .id(so.getId())
                 .orderNumber(so.getOrderNumber())
@@ -352,6 +360,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
                 .status(so.getStatus())
                 .source(so.getSource())
                 .warehouseId(so.getWarehouseId())
+                .contactMini(contactMiniDto)
                 .customerId(so.getCustomer().getId())
                 .customerName(so.getCustomer().getName())
                 .remarks(so.getRemarks())

@@ -3,7 +3,7 @@ package com.ezh.Inventory.sales.payment.service;
 import com.ezh.Inventory.contacts.entiry.Contact;
 import com.ezh.Inventory.contacts.repository.ContactRepository;
 import com.ezh.Inventory.sales.invoice.entity.Invoice;
-import com.ezh.Inventory.sales.invoice.entity.InvoiceStatus;
+import com.ezh.Inventory.sales.invoice.entity.InvoicePaymentStatus;
 import com.ezh.Inventory.sales.invoice.repository.InvoiceRepository;
 import com.ezh.Inventory.sales.payment.dto.*;
 import com.ezh.Inventory.sales.payment.entity.Payment;
@@ -250,9 +250,9 @@ public class PaymentServiceImpl implements PaymentService {
         invoice.setBalance(newBalance);
 
         if (newBalance.compareTo(BigDecimal.ZERO) <= 0) {
-            invoice.setStatus(InvoiceStatus.PAID);
+            invoice.setPaymentStatus(InvoicePaymentStatus.PAID);
         } else {
-            invoice.setStatus(InvoiceStatus.PARTIALLY_PAID);
+            invoice.setPaymentStatus(InvoicePaymentStatus.PARTIALLY_PAID);
         }
         invoiceRepository.save(invoice);
     }

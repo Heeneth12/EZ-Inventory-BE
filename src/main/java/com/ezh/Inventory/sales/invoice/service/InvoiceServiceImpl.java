@@ -1,18 +1,18 @@
 package com.ezh.Inventory.sales.invoice.service;
 
+import com.ezh.Inventory.contacts.dto.ContactMiniDto;
 import com.ezh.Inventory.contacts.entiry.Contact;
 import com.ezh.Inventory.contacts.repository.ContactRepository;
 import com.ezh.Inventory.items.entity.Item;
 import com.ezh.Inventory.items.repository.ItemRepository;
 import com.ezh.Inventory.sales.delivery.service.DeliveryService;
 import com.ezh.Inventory.sales.invoice.dto.*;
-import com.ezh.Inventory.sales.invoice.entity.Invoice;
-import com.ezh.Inventory.sales.invoice.entity.InvoiceItem;
-import com.ezh.Inventory.sales.invoice.entity.InvoiceStatus;
+import com.ezh.Inventory.sales.invoice.entity.*;
 import com.ezh.Inventory.sales.invoice.repository.InvoiceItemRepository;
 import com.ezh.Inventory.sales.invoice.repository.InvoiceRepository;
 import com.ezh.Inventory.sales.order.entity.SalesOrder;
 import com.ezh.Inventory.sales.order.entity.SalesOrderItem;
+import com.ezh.Inventory.sales.order.entity.SalesOrderSource;
 import com.ezh.Inventory.sales.order.entity.SalesOrderStatus;
 import com.ezh.Inventory.sales.order.repository.SalesOrderItemRepository;
 import com.ezh.Inventory.sales.order.repository.SalesOrderRepository;
@@ -22,6 +22,8 @@ import com.ezh.Inventory.stock.entity.ReferenceType;
 import com.ezh.Inventory.stock.service.StockService;
 import com.ezh.Inventory.utils.UserContextUtil;
 import com.ezh.Inventory.utils.common.CommonResponse;
+import com.ezh.Inventory.utils.common.DocPrefix;
+import com.ezh.Inventory.utils.common.DocumentNumberUtil;
 import com.ezh.Inventory.utils.common.Status;
 import com.ezh.Inventory.utils.exception.BadRequestException;
 import com.ezh.Inventory.utils.exception.CommonException;
@@ -69,11 +71,13 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice invoice = Invoice.builder()
                 .tenantId(tenantId)
                 .warehouseId(salesOrder.getWarehouseId())
-                .invoiceNumber(generateInvoiceNumber())
+                .invoiceNumber(DocumentNumberUtil.generate(DocPrefix.INV))
                 .invoiceDate(new Date())
                 .salesOrder(salesOrder)
                 .customer(contact)
                 .status(InvoiceStatus.PENDING)
+                .paymentStatus(InvoicePaymentStatus.UNPAID)
+                .deliveryStatus(InvoiceDeliveryStatus.PENDING)
                 .items(new ArrayList<>())
                 .remarks(dto.getRemarks())
                 //Now this SAVE will work because all non-null fields have values
@@ -169,6 +173,23 @@ public class InvoiceServiceImpl implements InvoiceService {
         Page<Invoice> invoices = invoiceRepository.findByTenantId(tenantId, pageable);
         return invoices.map(this::mapToDto);
     }
+
+
+    @Override
+    @Transactional
+    public CommonResponse updateInvoiceStatus(Long invoiceId, InvoiceStatus status) throws CommonException {
+
+        Invoice invoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new CommonException("Invoice not found", HttpStatus.NOT_FOUND));
+
+        invoice.setStatus(status);
+        invoiceRepository.save(invoice);
+
+        return CommonResponse.builder()
+                .message("Invoice status updated successfully")
+                .build();
+    }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -381,9 +402,10 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .tenantId(tenantId)
                 .warehouseId(dto.getWarehouseId())
                 .customer(contact)
-                .orderNumber("SO-DIR-" + System.currentTimeMillis()) // Unique prefix for Direct Bills
+                .orderNumber(DocumentNumberUtil.generate(DocPrefix.SO)) // Unique prefix for Direct Bills
                 .orderDate(new Date())
-                .status(SalesOrderStatus.DIRECT_INVOICED)
+                .status(SalesOrderStatus.CREATED)
+                .source(SalesOrderSource.DIRECT_SALES)
                 .remarks("Auto-generated from Direct Invoice")
                 .items(new ArrayList<>())
                 .build();
@@ -620,17 +642,28 @@ public class InvoiceServiceImpl implements InvoiceService {
                         .build())
                 .collect(Collectors.toList());
 
+        ContactMiniDto contactMini = ContactMiniDto
+                .builder()
+                .id(invoice.getCustomer().getId())
+                .contactCode(invoice.getCustomer().getContactCode())
+                .name(invoice.getCustomer().getName())
+                .build();
+
         return InvoiceDto.builder()
                 .id(invoice.getId())
                 .invoiceNumber(invoice.getInvoiceNumber())
                 .salesOrderId(invoice.getSalesOrder() != null ? invoice.getSalesOrder().getId() : null)
+                .contactMini(contactMini)
                 .customerId(invoice.getCustomer().getId())
                 .customerName(invoice.getCustomer().getName())
                 .invoiceDate(invoice.getInvoiceDate())
                 .totalDiscount(invoice.getTotalDiscount()) // Add this
                 .totalTax(invoice.getTotalTax())           // Add this
                 .status(invoice.getStatus())
+                .deliveryStatus(invoice.getDeliveryStatus())
+                .paymentStatus(invoice.getPaymentStatus())
                 .subTotal(invoice.getSubTotal())
+                .amountPaid(invoice.getAmountPaid())
                 .grandTotal(invoice.getGrandTotal())
                 .balance(invoice.getBalance())
                 .items(itemDtos)

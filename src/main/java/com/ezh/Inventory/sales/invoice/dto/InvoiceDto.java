@@ -1,9 +1,11 @@
 package com.ezh.Inventory.sales.invoice.dto;
 
 import com.ezh.Inventory.contacts.dto.ContactDto;
+import com.ezh.Inventory.contacts.dto.ContactMiniDto;
+import com.ezh.Inventory.sales.invoice.entity.InvoiceDeliveryStatus;
+import com.ezh.Inventory.sales.invoice.entity.InvoicePaymentStatus;
 import com.ezh.Inventory.sales.invoice.entity.InvoiceStatus;
 import com.ezh.Inventory.sales.order.dto.SalesOrderDto;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,10 +24,14 @@ public class InvoiceDto {
     private String invoiceNumber; // INV-2025-0001
     private Long salesOrderId;
     private SalesOrderDto salesOrderDto;
+    private ContactMiniDto contactMini;
+    private Integer progressStep; //UI
     private Long customerId;
     private String customerName;
     private ContactDto customer;
     private InvoiceStatus status;
+    private InvoiceDeliveryStatus deliveryStatus;
+    private InvoicePaymentStatus paymentStatus;
     private Date invoiceDate;
     private List<InvoiceItemDto> items;
     private BigDecimal subTotal; // qty × price (sum of all line totals before tax)
