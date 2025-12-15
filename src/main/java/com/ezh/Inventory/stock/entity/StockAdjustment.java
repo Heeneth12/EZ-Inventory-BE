@@ -4,6 +4,10 @@ import com.ezh.Inventory.utils.common.CommonSerializable;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 
 @Entity
 @Table(name = "stock_adjustment")
@@ -14,35 +18,32 @@ import lombok.*;
 @Builder
 public class StockAdjustment extends CommonSerializable {
 
-    @Column(name = "item_id", nullable = false)
-    private Long itemId;
-
     @Column(name = "tenant_id", nullable = false)
     private Long tenantId;
+
+    @Column(name = "adjustment_number", nullable = false, unique = true)
+    private String adjustmentNumber; // e.g., ADJ-2025-0001
 
     @Column(name = "warehouse_id", nullable = false)
     private Long warehouseId;
 
-    @Enumerated(EnumType.STRING)
+    @Column(name = "adjustment_date", nullable = false)
+    private Date adjustmentDate;
+
     @Column(name = "reason_type", nullable = false)
-    private AdjustmentType reasonType;
-    // Examples: DAMAGE, EXPIRED, AUDIT_CORRECTION, FOUND_EXTRA, LOST, SPILLAGE
+    private AdjustmentType reasonType; // DAMAGE, EXPIRED
 
-    @Column(name = "notes")
-    private String notes;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private AdjustmentStatus status; //DRAFT (Counting in progress), APPROVED (Stock updated), CANCELLED
 
-    @Column(name = "system_qty", nullable = false)
-    private Integer systemQty; // Before adjustment
+    @Column(name = "reference", length = 100)
+    private String reference;
 
-    @Column(name = "counted_qty", nullable = false)
-    private Integer countedQty; // After physical counting
+    @Column(name = "remarks")
+    private String remarks;
 
-    @Column(name = "difference_qty", nullable = false)
-    private Integer differenceQty; // counted_qty - system_qty (POSITIVE/NEGATIVE)
-
-    @Column(name = "adjusted_by")
-    private Long adjustedBy; // user id
-
-    @Column(name = "adjusted_at")
-    private Long adjustedAt; // timestamp
+    @Builder.Default
+    @OneToMany(mappedBy = "stockAdjustment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StockAdjustmentItem> adjustmentItems = new ArrayList<>();
 }
