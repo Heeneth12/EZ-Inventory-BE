@@ -1,5 +1,6 @@
 package com.ezh.Inventory.sales.payment.service;
 
+import com.ezh.Inventory.contacts.dto.ContactMiniDto;
 import com.ezh.Inventory.contacts.entiry.Contact;
 import com.ezh.Inventory.contacts.repository.ContactRepository;
 import com.ezh.Inventory.sales.invoice.dto.InvoiceMiniDto;
@@ -304,6 +305,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .customerId(payment.getCustomer().getId())
                 .customerName(payment.getCustomer().getName())
                 .paymentDate(payment.getPaymentDate())
+                .contactMini(new ContactMiniDto(payment.getCustomer()))
                 .amount(payment.getAmount())
                 .status(payment.getStatus())
                 .paymentMethod(payment.getPaymentMethod())
