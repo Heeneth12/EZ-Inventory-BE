@@ -1,6 +1,5 @@
 package com.ezh.Inventory.sales.order.repository;
 
-import com.ezh.Inventory.sales.order.dto.SalesOrderFilter;
 import com.ezh.Inventory.sales.order.entity.SalesOrder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +35,27 @@ public interface SalesOrderRepository extends JpaRepository<SalesOrder, Long> {
             @Param("status") String status,
             @Param("customerId") Long customerId,
             @Param("warehouseId") Long warehouseId
+    );
+
+
+    @Query(
+            value = """
+                    SELECT * FROM sales_order so
+                    WHERE so.tenant_id = :tenantId
+                      AND (:id IS NULL OR so.id = :id)
+                      AND (:status IS NULL OR so.status = :status)
+                      AND (:customerId IS NULL OR so.customer_id = :customerId)
+                      AND (:warehouseId IS NULL OR so.warehouse_id = :warehouseId)
+                    """,
+            nativeQuery = true
+    )
+    Page<SalesOrder> getAllSalesOrders(
+            @Param("tenantId") Long tenantId,
+            @Param("id") Long id,
+            @Param("status") String status,
+            @Param("customerId") Long customerId,
+            @Param("warehouseId") Long warehouseId,
+            Pageable pageable
     );
 
 }

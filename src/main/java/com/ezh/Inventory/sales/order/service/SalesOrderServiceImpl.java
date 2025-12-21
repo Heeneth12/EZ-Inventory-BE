@@ -177,7 +177,9 @@ public class SalesOrderServiceImpl implements SalesOrderService {
         Pageable pageable = PageRequest.of(page, size);
 
         // You can add Specification/Filter logic here based on 'SalesOrderFilter'
-        Page<SalesOrder> result = salesOrderRepository.findAll(pageable); // Replace with findByTenantId logic if repository supports it
+        Page<SalesOrder> result = salesOrderRepository.getAllSalesOrders(
+                tenantId, filter.getId(), filter.getStatus(), filter.getCustomerId(),
+                filter.getWarehouseId(), pageable); // Replace with findByTenantId logic if repository supports it
 
         return result.map(this::mapToDto);
     }
