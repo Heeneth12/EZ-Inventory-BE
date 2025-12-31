@@ -20,6 +20,7 @@ public class ContactDto {
     private String email;
     private String phone;
     private String gstNumber;
+    private Integer creditDays;
     private ContactType type;// VENDOR / CUSTOMER / BOTH
     private Boolean active;
     private List<AddressDto> addresses;

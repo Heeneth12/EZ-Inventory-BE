@@ -24,6 +24,8 @@ public class Contact extends CommonSerializable{
     private String gstNumber;
     @Enumerated(EnumType.STRING)
     private ContactType type;
+    @Column(name = "credit_days", nullable = true)
+    private Integer creditDays;
     private Boolean active;
     @OneToMany(mappedBy = "contact", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

@@ -6,7 +6,6 @@ import com.ezh.Inventory.contacts.dto.ContactFilter;
 import com.ezh.Inventory.contacts.entiry.Address;
 import com.ezh.Inventory.contacts.entiry.Contact;
 import com.ezh.Inventory.contacts.repository.ContactRepository;
-import com.ezh.Inventory.utils.UserContextUtil;
 import com.ezh.Inventory.utils.common.CommonResponse;
 import com.ezh.Inventory.utils.common.Status;
 import com.ezh.Inventory.utils.exception.BadRequestException;
@@ -59,6 +58,7 @@ public class ContactServiceImpl implements ContactService {
         existing.setName(contactDto.getName());
         existing.setEmail(contactDto.getEmail());
         existing.setPhone(contactDto.getPhone());
+        existing.setCreditDays(contactDto.getCreditDays());
         existing.setGstNumber(contactDto.getGstNumber());
         existing.setType(contactDto.getType());
         existing.setActive(contactDto.getActive() != null ? contactDto.getActive() : true);
@@ -155,6 +155,7 @@ public class ContactServiceImpl implements ContactService {
                 .name(dto.getName())
                 .email(dto.getEmail())
                 .phone(dto.getPhone())
+                .creditDays(dto.getCreditDays())
                 .gstNumber(dto.getGstNumber())
                 .type(dto.getType())
                 .active(dto.getActive() != null ? dto.getActive() : true)
@@ -166,6 +167,8 @@ public class ContactServiceImpl implements ContactService {
                         .type(a.getType())
                         .addressLine1(a.getAddressLine1())
                         .addressLine2(a.getAddressLine2())
+                        .area(a.getArea())
+                        .route(a.getRoute())
                         .city(a.getCity())
                         .state(a.getState())
                         .country(a.getCountry())
@@ -188,6 +191,7 @@ public class ContactServiceImpl implements ContactService {
                 .name(contact.getName())
                 .email(contact.getEmail())
                 .phone(contact.getPhone())
+                .creditDays(contact.getCreditDays())
                 .gstNumber(contact.getGstNumber())
                 .type(contact.getType())
                 .active(contact.getActive());
@@ -200,6 +204,8 @@ public class ContactServiceImpl implements ContactService {
                             .type(a.getType())
                             .addressLine1(a.getAddressLine1())
                             .addressLine2(a.getAddressLine2())
+                            .route(a.getRoute())
+                            .area(a.getArea())
                             .city(a.getCity())
                             .state(a.getState())
                             .country(a.getCountry())
