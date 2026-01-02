@@ -60,7 +60,7 @@ public class ContactServiceImpl implements ContactService {
         existing.setPhone(contactDto.getPhone());
         existing.setCreditDays(contactDto.getCreditDays());
         existing.setGstNumber(contactDto.getGstNumber());
-        existing.setType(contactDto.getType());
+        existing.setContactType(contactDto.getType());
         existing.setActive(contactDto.getActive() != null ? contactDto.getActive() : true);
 
         repository.save(existing);
@@ -88,6 +88,7 @@ public class ContactServiceImpl implements ContactService {
         log.info("get all");
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         Page<Contact> contacts = repository.searchContacts(
+                getTenantIdOrThrow(),
                 contactFilter.getSearchQuery(),
                 contactFilter.getName(),
                 contactFilter.getEmail(),
@@ -130,6 +131,7 @@ public class ContactServiceImpl implements ContactService {
         Pageable pageable = Pageable.unpaged();
 
         Page<Contact> contacts = repository.searchContacts(
+                getTenantIdOrThrow(),
                 contactFilter.getSearchQuery(),
                 contactFilter.getName(),
                 contactFilter.getEmail(),
@@ -157,14 +159,14 @@ public class ContactServiceImpl implements ContactService {
                 .phone(dto.getPhone())
                 .creditDays(dto.getCreditDays())
                 .gstNumber(dto.getGstNumber())
-                .type(dto.getType())
+                .contactType(dto.getType())
                 .active(dto.getActive() != null ? dto.getActive() : true)
                 .build();
 
         if (dto.getAddresses() != null && !dto.getAddresses().isEmpty()) {
             dto.getAddresses().forEach(a -> {
                 Address address = Address.builder()
-                        .type(a.getType())
+                        .addressType(a.getType())
                         .addressLine1(a.getAddressLine1())
                         .addressLine2(a.getAddressLine2())
                         .area(a.getArea())
@@ -193,7 +195,7 @@ public class ContactServiceImpl implements ContactService {
                 .phone(contact.getPhone())
                 .creditDays(contact.getCreditDays())
                 .gstNumber(contact.getGstNumber())
-                .type(contact.getType())
+                .type(contact.getContactType())
                 .active(contact.getActive());
 
         if (contact.getAddresses() != null && !contact.getAddresses().isEmpty()) {
@@ -201,7 +203,7 @@ public class ContactServiceImpl implements ContactService {
                     .stream()
                     .map(a -> AddressDto.builder()
                             .id(a.getId())
-                            .type(a.getType())
+                            .type(a.getAddressType())
                             .addressLine1(a.getAddressLine1())
                             .addressLine2(a.getAddressLine2())
                             .route(a.getRoute())

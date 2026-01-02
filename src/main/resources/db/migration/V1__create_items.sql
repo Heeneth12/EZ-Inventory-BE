@@ -18,7 +18,7 @@ CREATE TABLE inventory.items (
     item_code VARCHAR(255) NOT NULL UNIQUE,
     sku VARCHAR(255),
     barcode VARCHAR(255),
-    item_type inventory.item_type NOT NULL,
+    item_type VARCHAR(50) NOT NULL,
     image_url VARCHAR(500),
     category VARCHAR(255),
     unit_of_measure VARCHAR(50),
