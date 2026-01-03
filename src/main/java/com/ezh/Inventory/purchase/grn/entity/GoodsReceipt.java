@@ -3,8 +3,6 @@ package com.ezh.Inventory.purchase.grn.entity;
 import com.ezh.Inventory.utils.common.CommonSerializable;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "goods_receipt")
@@ -31,8 +29,7 @@ public class GoodsReceipt extends CommonSerializable {
     private String supplierInvoiceNo; // The paper bill number from supplier
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "status", columnDefinition = "grn_status")
-    private GrnStatus status;
+    @Column(name = "grn_status", length = 50)
+    private GrnStatus grnStatus;
     // PENDING_QA, APPROVED (Stock Increases here), REJECTED
 }

@@ -57,7 +57,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
                 .warehouseId(dto.getWarehouseId()) // Store the warehouse ID
                 .returnDate(System.currentTimeMillis())
                 .reason(dto.getReason())
-                .status(ReturnStatus.COMPLETED)
+                .prStatus(ReturnStatus.COMPLETED)
                 .build();
         returnRepository.save(purchaseReturn);
 
@@ -138,7 +138,7 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
                 .goodsReceiptId(pr.getGoodsReceiptId())
                 .reason(pr.getReason())
                 .items(itemDtos)
-                .status(pr.getStatus())
+                .status(pr.getPrStatus())
                 .build();
     }
 

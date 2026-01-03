@@ -60,7 +60,7 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService {
                 .warehouseId(dto.getWarehouseId())
                 .adjustmentNumber(DocumentNumberUtil.generate(DocPrefix.ADJ))
                 .adjustmentDate(new Date())
-                .status(AdjustmentStatus.DRAFT)
+                .adjustmentStatus(AdjustmentStatus.DRAFT)
                 .reference(dto.getReference())
                 .remarks(dto.getRemarks())
                 .reasonType(dto.getReasonType())
@@ -170,10 +170,10 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService {
         // 4. Decision: Wait or Commit?
         if (approvalResponse.getData() == ApprovalResultStatus.APPROVAL_REQUIRED) {
             // CASE A: Stop here. Wait for approval.
-            adjustment.setStatus(AdjustmentStatus.PENDING_APPROVAL);
+            adjustment.setAdjustmentStatus(AdjustmentStatus.PENDING_APPROVAL);
         } else {
             // CASE B: Auto-approved. Commit stock NOW.
-            adjustment.setStatus(AdjustmentStatus.COMPLETED);
+            adjustment.setAdjustmentStatus(AdjustmentStatus.COMPLETED);
 
             // *** CRITICAL: Perform the Stock Movement Loop Here ***
             applyStockMovements(adjustment, dto.getWarehouseId());
@@ -183,7 +183,7 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService {
 
         return CommonResponse.builder()
                 .status(Status.SUCCESS)
-                .message(adjustment.getStatus() == AdjustmentStatus.PENDING_APPROVAL
+                .message(adjustment.getAdjustmentStatus() == AdjustmentStatus.PENDING_APPROVAL
                         ? "Adjustment submitted for approval"
                         : "Adjustment completed successfully")
                 .id(String.valueOf(adjustment.getId()))
@@ -203,7 +203,7 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService {
                 .id(adj.getId())
                 .adjustmentNumber(adj.getAdjustmentNumber())
                 .adjustmentDate(adj.getAdjustmentDate())
-                .status(adj.getStatus())
+                .status(adj.getAdjustmentStatus())
                 .warehouseId(adj.getWarehouseId())
                 .reference(adj.getReference())
                 .totalItems(adj.getAdjustmentItems().size())
@@ -216,9 +216,9 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService {
         StockAdjustment adjustment = stockAdjustmentRepository.findById(adjustmentId)
                 .orElseThrow(() -> new CommonException("Adjustment not found", HttpStatus.NOT_FOUND));
 
-        if (adjustment.getStatus() != AdjustmentStatus.PENDING_APPROVAL) {
+        if (adjustment.getAdjustmentStatus() != AdjustmentStatus.PENDING_APPROVAL) {
             // Idempotency check: if already completed, do nothing
-            if (adjustment.getStatus() == AdjustmentStatus.COMPLETED) return;
+            if (adjustment.getAdjustmentStatus() == AdjustmentStatus.COMPLETED) return;
             throw new BadRequestException("Adjustment is not pending approval");
         }
 
@@ -226,7 +226,7 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService {
         applyStockMovements(adjustment, adjustment.getWarehouseId());
 
         // 2. Update Status
-        adjustment.setStatus(AdjustmentStatus.COMPLETED);
+        adjustment.setAdjustmentStatus(AdjustmentStatus.COMPLETED);
         stockAdjustmentRepository.save(adjustment);
     }
 
@@ -235,12 +235,12 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService {
         StockAdjustment adjustment = stockAdjustmentRepository.findById(adjustmentId)
                 .orElseThrow(() -> new CommonException("Adjustment not found", HttpStatus.NOT_FOUND));
 
-        if (adjustment.getStatus() != AdjustmentStatus.PENDING_APPROVAL) {
+        if (adjustment.getAdjustmentStatus() != AdjustmentStatus.PENDING_APPROVAL) {
             throw new BadRequestException("Adjustment is not pending approval");
         }
 
         // Simply mark as Rejected. No stock movement occurs.
-        adjustment.setStatus(AdjustmentStatus.REJECTED);
+        adjustment.setAdjustmentStatus(AdjustmentStatus.REJECTED);
         stockAdjustmentRepository.save(adjustment);
     }
 
@@ -268,7 +268,7 @@ public class StockAdjustmentServiceImpl implements StockAdjustmentService {
                 .id(adjustment.getId())
                 .adjustmentNumber(adjustment.getAdjustmentNumber())
                 .adjustmentDate(adjustment.getAdjustmentDate())
-                .status(adjustment.getStatus())
+                .status(adjustment.getAdjustmentStatus())
                 .warehouseId(adjustment.getWarehouseId())
                 .remarks(adjustment.getRemarks())
                 .reference(adjustment.getReference())

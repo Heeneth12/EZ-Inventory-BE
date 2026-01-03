@@ -3,8 +3,6 @@ package com.ezh.Inventory.purchase.returns.entity;
 import com.ezh.Inventory.utils.common.CommonSerializable;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "purchase_return")
@@ -34,7 +32,6 @@ public class PurchaseReturn extends CommonSerializable {
     private String reason;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "status", columnDefinition = "return_status")
-    private ReturnStatus status; // DRAFT, COMPLETED
+    @Column(name = "pr_status", length = 50)
+    private ReturnStatus prStatus;
 }

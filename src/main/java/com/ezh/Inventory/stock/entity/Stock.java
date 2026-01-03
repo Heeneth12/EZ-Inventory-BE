@@ -17,25 +17,25 @@ import java.math.BigDecimal;
 @Builder
 public class Stock extends CommonSerializable {
 
-    @Column(name = "item_id", nullable = false)
+    @Column(name = "item_id")
     private Long itemId;
 
-    @Column(name = "tenant_id", nullable = false)
+    @Column(name = "tenant_id")
     private Long tenantId;
 
-    @Column(name = "warehouse_id", nullable = false)
+    @Column(name = "warehouse_id")
     private Long warehouseId;
 
-    @Column(name = "opening_qty", nullable = false)
+    @Column(name = "opening_qty")
     private Integer openingQty = 0;
 
-    @Column(name = "in_qty", nullable = false)
+    @Column(name = "in_qty")
     private Integer inQty = 0;
 
-    @Column(name = "out_qty", nullable = false)
+    @Column(name = "out_qty")
     private Integer outQty = 0;
 
-    @Column(name = "closing_qty", nullable = false)
+    @Column(name = "closing_qty")
     private Integer closingQty = 0;
 
     @Column(name = "average_cost", precision = 18, scale = 2)

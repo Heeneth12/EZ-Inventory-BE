@@ -3,8 +3,6 @@ package com.ezh.Inventory.purchase.po.entity;
 import com.ezh.Inventory.utils.common.CommonSerializable;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 
@@ -39,9 +37,8 @@ public class PurchaseOrder extends CommonSerializable {
     private Long expectedDeliveryDate;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "status", columnDefinition = "po_status")
-    private PoStatus status;
+    @Column(name = "po_status", length = 50)
+    private PoStatus poStatus;
     // DRAFT, ISSUED, PARTIALLY_RECEIVED, COMPLETED, CANCELLED
 
     @Column(name = "total_amount", precision = 18, scale = 2)

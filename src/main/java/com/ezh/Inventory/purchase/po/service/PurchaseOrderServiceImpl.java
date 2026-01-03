@@ -53,7 +53,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 .orderNumber("PO-" + System.currentTimeMillis()) // Replace with sequence generator
                 .orderDate(System.currentTimeMillis())
                 .expectedDeliveryDate(dto.getExpectedDeliveryDate())
-                .status(PoStatus.ISSUED) // Or DRAFT if you want an approval step
+                .poStatus(PoStatus.ISSUED) // Or DRAFT if you want an approval step
                 .notes(dto.getNotes())
                 .build();
 
@@ -120,7 +120,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 .orElseThrow(() -> new CommonException("PO not found", HttpStatus.BAD_REQUEST));
 
         // VALIDATION: Can only edit if Draft or Issued (and nothing received yet)
-        if (po.getStatus() == PoStatus.PARTIALLY_RECEIVED || po.getStatus() == PoStatus.COMPLETED) {
+        if (po.getPoStatus() == PoStatus.PARTIALLY_RECEIVED || po.getPoStatus() == PoStatus.COMPLETED) {
             throw new CommonException("Cannot edit a PO that has already received goods.", HttpStatus.BAD_REQUEST);
         }
 
@@ -176,7 +176,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             throw new CommonException("Cannot cancel PO. Goods have already been received. Use Purchase Return instead.", HttpStatus.BAD_REQUEST);
         }
 
-        po.setStatus(PoStatus.CANCELLED);
+        po.setPoStatus(PoStatus.CANCELLED);
         poRepository.save(po);
 
         return CommonResponse.builder().id(String.valueOf(po.getId())).message("Purchase Order Cancelled").build();
@@ -192,7 +192,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         dto.setWarehouseId(po.getWarehouseId());
         dto.setOrderNumber(po.getOrderNumber());
         dto.setExpectedDeliveryDate(po.getExpectedDeliveryDate());
-        dto.setStatus(po.getStatus());
+        dto.setStatus(po.getPoStatus());
         dto.setNotes(po.getNotes());
         dto.setTotalAmount(po.getTotalAmount());
 

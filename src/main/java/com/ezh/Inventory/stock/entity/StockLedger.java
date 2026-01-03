@@ -3,8 +3,6 @@ package com.ezh.Inventory.stock.entity;
 import com.ezh.Inventory.utils.common.CommonSerializable;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 
@@ -17,35 +15,33 @@ import java.math.BigDecimal;
 @Builder
 public class StockLedger extends CommonSerializable {
 
-    @Column(name = "item_id", nullable = false)
+    @Column(name = "item_id")
     private Long itemId;
 
-    @Column(name = "tenant_id", nullable = false)
+    @Column(name = "tenant_id")
     private Long tenantId;
 
-    @Column(name = "warehouse_id", nullable = false)
+    @Column(name = "warehouse_id")
     private Long warehouseId;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "transaction_type", columnDefinition = "movement_type") // IN / OUT
+    @Column(name = "transaction_type")
     private MovementType transactionType;
 
-    @Column(name = "quantity", nullable = false)
+    @Column(name = "quantity")
     private Integer quantity;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "reference_type", columnDefinition = "reference_type") // GRN / SALE / TRANSFER / RETURN
+    @Column(name = "reference_type")
     private ReferenceType referenceType;
 
     @Column(name = "reference_id")  //GRN_ID / SALE_ID ...
     private Long referenceId;
 
-    @Column(name = "before_qty", nullable = false)
+    @Column(name = "before_qty")
     private Integer beforeQty;
 
-    @Column(name = "after_qty", nullable = false)
+    @Column(name = "after_qty")
     private Integer afterQty;
 
     @Column(name = "unit_price", precision = 18, scale = 2)

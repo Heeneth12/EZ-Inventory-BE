@@ -12,7 +12,6 @@ import com.ezh.Inventory.purchase.po.entity.PurchaseOrder;
 import com.ezh.Inventory.purchase.po.entity.PurchaseOrderItem;
 import com.ezh.Inventory.purchase.po.repository.PurchaseOrderItemRepository;
 import com.ezh.Inventory.purchase.po.repository.PurchaseOrderRepository;
-import com.ezh.Inventory.purchase.po.service.PurchaseOrderServiceImpl;
 import com.ezh.Inventory.stock.dto.StockUpdateDto;
 import com.ezh.Inventory.stock.entity.MovementType;
 import com.ezh.Inventory.stock.entity.ReferenceType;
@@ -62,7 +61,7 @@ public class GoodsReceiptServiceImpl implements GoodsReceiptService {
                 .grnNumber("GRN-" + System.currentTimeMillis())
                 .receivedDate(System.currentTimeMillis())
                 .supplierInvoiceNo(dto.getSupplierInvoiceNo())
-                .status(GrnStatus.APPROVED)
+                .grnStatus(GrnStatus.APPROVED)
                 .build();
         grnRepository.save(grn);
 
@@ -136,9 +135,9 @@ public class GoodsReceiptServiceImpl implements GoodsReceiptService {
 
         // 4. Update PO Header Status
         if (isPoFullyReceived) {
-            po.setStatus(PoStatus.COMPLETED);
+            po.setPoStatus(PoStatus.COMPLETED);
         } else {
-            po.setStatus(PoStatus.PARTIALLY_RECEIVED);
+            po.setPoStatus(PoStatus.PARTIALLY_RECEIVED);
         }
         poRepository.save(po);
 
@@ -203,7 +202,7 @@ public class GoodsReceiptServiceImpl implements GoodsReceiptService {
                 .grnNumber(grn.getGrnNumber())
                 .purchaseOrderId(grn.getPurchaseOrderId())
                 .supplierInvoiceNo(grn.getSupplierInvoiceNo())
-                .status(grn.getStatus())
+                .status(grn.getGrnStatus())
                 .items(
                         items.stream()
                                 .map(this::mapToGrnItemDto)
