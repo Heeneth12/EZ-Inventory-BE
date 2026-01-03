@@ -1,10 +1,8 @@
 package com.ezh.Inventory.approval.entity;
 
-import com.ezh.Inventory.utils.common.CommonSerializable; // Assuming this exists
+import com.ezh.Inventory.utils.common.CommonSerializable;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 
@@ -22,8 +20,7 @@ public class ApprovalRequest extends CommonSerializable {
 
     // What kind of approval is this? (e.g., HIGH_VALUE_INVOICE)
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "approval_type", length = 50, columnDefinition = "approval_type")
+    @Column(name = "approval_type", length = 50, nullable = false)
     private ApprovalType approvalType;
 
     // --- Link to the Source ---
@@ -37,15 +34,12 @@ public class ApprovalRequest extends CommonSerializable {
 
     // --- Status Tracking ---
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "status", columnDefinition= "approval_status")
-    private ApprovalStatus status;
+    @Column(name = "approval_status", length = 50, nullable = false)
+    private ApprovalStatus approvalStatus;
 
     // The user who tried to create the Invoice/PO
     @Column(name = "requested_by", nullable = false)
     private Long requestedBy;
-
-    // --- Context Data ---
 
     // Why was this triggered?
     // e.g., "Discount 15% exceeds limit 10%"

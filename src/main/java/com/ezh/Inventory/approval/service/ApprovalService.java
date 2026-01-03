@@ -119,7 +119,7 @@ public class ApprovalService {
                 .orElseThrow(() -> new CommonException("Request not found", HttpStatus.NOT_FOUND));
 
         // 2. Update the Request Log
-        request.setStatus(actionDto.getStatus()); // APPROVED or REJECTED
+        request.setApprovalStatus(actionDto.getStatus()); // APPROVED or REJECTED
         request.setActionedBy(UserContextUtil.getUserId());
         request.setActionRemarks(actionDto.getRemarks());
         approvalRequestRepository.save(request);
@@ -255,7 +255,7 @@ public class ApprovalService {
                 .referenceId(context.getReferenceId())
                 .referenceCode(context.getReferenceCode())
                 .requestedBy(UserContextUtil.getUserId())
-                .status(ApprovalStatus.PENDING)
+                .approvalStatus(ApprovalStatus.PENDING)
                 .description(reason)
                 // Store the value that triggered it (Amount OR Percentage)
                 .valueAmount(context.getAmount() != null ? context.getAmount() : BigDecimal.valueOf(context.getPercentage()))
@@ -294,7 +294,7 @@ public class ApprovalService {
                 .approvalType(entity.getApprovalType())
                 .referenceId(entity.getReferenceId())
                 .referenceCode(entity.getReferenceCode())
-                .status(entity.getStatus())
+                .status(entity.getApprovalStatus())
                 .requestedBy(entity.getRequestedBy())
                 .description(entity.getDescription())
                 .valueAmount(entity.getValueAmount())

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequest, Long> {
 
-    List<ApprovalRequest> findByTenantIdAndStatus(Long tenantId, String status);
+    List<ApprovalRequest> findByTenantIdAndApprovalStatus(Long tenantId, String status);
     Optional<ApprovalRequest> findByIdAndTenantId (Long approvalRequestId, Long tenantId);
     Page<ApprovalRequest> findByTenantId(Long tenantId, Pageable pageable);
 }

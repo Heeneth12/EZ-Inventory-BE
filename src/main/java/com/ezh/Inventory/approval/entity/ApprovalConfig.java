@@ -3,8 +3,6 @@ package com.ezh.Inventory.approval.entity;
 import com.ezh.Inventory.utils.common.CommonSerializable;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 
@@ -22,8 +20,7 @@ public class ApprovalConfig extends CommonSerializable {
     private Long tenantId;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "approval_type", columnDefinition = "approval_type")
+    @Column(name = "approval_type", length = 50, nullable = false)
     private ApprovalType approvalType;
 
     @Column(name = "is_enabled")
@@ -32,12 +29,10 @@ public class ApprovalConfig extends CommonSerializable {
 
     // --- The Rules ---
     // Use this for Invoice Value, PO Value, Stock Value
-    // e.g., If Invoice > 10000.00
     @Column(name = "threshold_amount")
     private BigDecimal thresholdAmount;
 
     // Use this for Discounts, Tax variance
-    // e.g., If Discount > 10.0 (percent)
     @Column(name = "threshold_percentage")
     private Double thresholdPercentage;
 
