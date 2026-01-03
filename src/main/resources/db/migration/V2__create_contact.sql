@@ -5,8 +5,6 @@ CREATE TABLE contact (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted BOOLEAN DEFAULT false,
-
-    -- Contact specific fields
     contact_code VARCHAR(255),
     tenant_id BIGINT NOT NULL,
     name VARCHAR(255),
@@ -25,8 +23,6 @@ CREATE TABLE address (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted BOOLEAN DEFAULT false,
-
-    -- Address specific fields
     address_line1 VARCHAR(255),
     address_line2 VARCHAR(255),
     route VARCHAR(255),
@@ -37,10 +33,7 @@ CREATE TABLE address (
     pin_code VARCHAR(20),
     address_type VARCHAR(50),
     contact_id BIGINT,
-
-    -- Foreign key constraint
-    CONSTRAINT fk_address_contact FOREIGN KEY (contact_id)
-        REFERENCES contact(id) ON DELETE CASCADE
+    CONSTRAINT fk_address_contact FOREIGN KEY (contact_id) REFERENCES contact(id) ON DELETE CASCADE
 );
 
 -- Create indexes for contact table
@@ -50,12 +43,6 @@ CREATE INDEX idx_contact_code ON contact(contact_code);
 CREATE INDEX idx_contact_email ON contact(email);
 CREATE INDEX idx_contact_phone ON contact(phone);
 CREATE INDEX idx_contact_gst_number ON contact(gst_number);
-CREATE INDEX idx_contact_type ON contact(contact_type);
-CREATE INDEX idx_contact_active ON contact(active);
-CREATE INDEX idx_contact_is_deleted ON contact(is_deleted);
-CREATE INDEX idx_contact_tenant_active ON contact(tenant_id, active) WHERE is_deleted = false;
-CREATE INDEX idx_contact_created_at ON contact(created_at);
-CREATE INDEX idx_contact_updated_at ON contact(updated_at);
 
 -- Create indexes for address table
 CREATE INDEX idx_address_uuid ON address(uuid);
@@ -64,9 +51,6 @@ CREATE INDEX idx_address_type ON address(address_type);
 CREATE INDEX idx_address_city ON address(city);
 CREATE INDEX idx_address_state ON address(state);
 CREATE INDEX idx_address_pin_code ON address(pin_code);
-CREATE INDEX idx_address_is_deleted ON address(is_deleted);
-CREATE INDEX idx_address_created_at ON address(created_at);
-CREATE INDEX idx_address_updated_at ON address(updated_at);
 
 -- Add comments
 COMMENT ON TABLE contact IS 'Stores contact information for customers, suppliers, etc.';
