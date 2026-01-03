@@ -5,8 +5,6 @@ import com.ezh.Inventory.sales.order.entity.SalesOrder;
 import com.ezh.Inventory.utils.common.CommonSerializable;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -43,23 +41,19 @@ public class Invoice extends CommonSerializable {
     private Contact customer;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "status", length = 20, columnDefinition = "invoice_status")
+    @Column(name = "status", length = 50, nullable = false)
     private InvoiceStatus status;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "delivery_status", length = 20, columnDefinition = "invoice_delivery_status")
+    @Column(name = "delivery_status", length = 50, nullable = false)
     private InvoiceDeliveryStatus deliveryStatus;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "payment_status", length = 20, columnDefinition = "invoice_payment_status")
+    @Column(name = "payment_status", length = 50, nullable = false)
     private InvoicePaymentStatus paymentStatus;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "invoice_type", length = 30, columnDefinition = "invoice_type")
+    @Column(name = "invoice_type", length = 50, nullable = false)
     private InvoiceType invoiceType;
 
     @Column(name = "sub_total", nullable = false)

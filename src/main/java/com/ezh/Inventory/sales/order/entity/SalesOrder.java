@@ -4,8 +4,6 @@ import com.ezh.Inventory.contacts.entiry.Contact;
 import com.ezh.Inventory.utils.common.CommonSerializable;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -38,13 +36,11 @@ public class SalesOrder extends CommonSerializable {
     private Date orderDate;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "status", length = 30, columnDefinition = "sales_order_status")
+    @Column(name = "status", length = 50)
     private SalesOrderStatus status;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "source", length = 30, columnDefinition = "sales_order_source")
+    @Column(name = "source", length = 50)
     private SalesOrderSource source;
 
     @Builder.Default
