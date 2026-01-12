@@ -29,7 +29,7 @@ public class MCPServiceImpl implements MCPService {
 
     private final ChatConversationRepository chatConversationRepository;
     private final ChatMessageRepository chatMessageRepository;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
     @Value("${mcp.ai.url}")
     private String mcpUrl;
