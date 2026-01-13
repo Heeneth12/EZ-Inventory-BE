@@ -203,6 +203,7 @@ public class GoodsReceiptServiceImpl implements GoodsReceiptService {
                 .purchaseOrderId(grn.getPurchaseOrderId())
                 .supplierInvoiceNo(grn.getSupplierInvoiceNo())
                 .status(grn.getGrnStatus())
+                .createdAt(grn.getCreatedAt())
                 .items(
                         items.stream()
                                 .map(this::mapToGrnItemDto)

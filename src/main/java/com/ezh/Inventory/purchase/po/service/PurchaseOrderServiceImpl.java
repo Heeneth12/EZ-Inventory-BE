@@ -195,6 +195,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         dto.setStatus(po.getPoStatus());
         dto.setNotes(po.getNotes());
         dto.setTotalAmount(po.getTotalAmount());
+        dto.setCreatedAt(po.getCreatedAt());
 
         // Only map items if allowed
         if (passItems && items != null) {

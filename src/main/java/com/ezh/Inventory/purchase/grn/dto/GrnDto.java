@@ -2,8 +2,8 @@ package com.ezh.Inventory.purchase.grn.dto;
 
 import com.ezh.Inventory.purchase.grn.entity.GrnStatus;
 import lombok.*;
-import org.springframework.security.core.parameters.P;
 
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -19,5 +19,6 @@ public class GrnDto {
     private Long purchaseOrderId;
     private String supplierInvoiceNo; // Optional
     private GrnStatus status;
+    private Date createdAt;
     private List<GrnItemDto> items;
 }

@@ -4,6 +4,7 @@ import com.ezh.Inventory.purchase.po.entity.PoStatus;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -21,5 +22,6 @@ public class PurchaseOrderDto {
     private PoStatus status;
     private String notes;
     private BigDecimal totalAmount;
+    private Date createdAt;
     private List<PurchaseOrderItemDto> items;
 }
