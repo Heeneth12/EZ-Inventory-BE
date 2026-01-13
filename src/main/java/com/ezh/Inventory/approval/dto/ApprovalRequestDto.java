@@ -24,6 +24,7 @@ public class ApprovalRequestDto {
     private BigDecimal valueAmount;
     private Long actionedBy;
     private String actionRemarks;
+    private Date approvedDate;
     private Date createdAt;
     private Date updatedAt;
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Entity
 @Table(name = "approval_request")
@@ -59,4 +60,7 @@ public class ApprovalRequest extends CommonSerializable {
     // e.g., "Approved this time, but stick to policy next time."
     @Column(name = "action_remarks")
     private String actionRemarks;
+
+    @Column(name = "approved_date")
+    private Date approvedDate;
 }
