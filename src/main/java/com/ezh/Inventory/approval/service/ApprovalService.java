@@ -302,6 +302,7 @@ public class ApprovalService {
                 .valueAmount(entity.getValueAmount())
                 .actionedBy(entity.getActionedBy())
                 .actionRemarks(entity.getActionRemarks())
+                .approvedDate(entity.getApprovedDate())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();

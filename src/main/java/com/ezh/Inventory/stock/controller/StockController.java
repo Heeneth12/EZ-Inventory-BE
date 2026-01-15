@@ -40,10 +40,10 @@ public class StockController {
         return ResponseResource.success(HttpStatus.OK, response, "Stock fetched successfully");
     }
 
-    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseResource<List<ItemStockSearchDto>> SearchStock(@RequestParam String query, @RequestParam Long warehouseId) throws CommonException {
-        log.info("Entered search stock with : {}", query);
-        List<ItemStockSearchDto> response = stockService.searchItemsWithBatches(query, warehouseId);
+    @PostMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseResource<List<ItemStockSearchDto>> SearchStock(@RequestBody StockFilterDto filter) throws CommonException {
+        log.info("Entered search stock with : {}", filter);
+        List<ItemStockSearchDto> response = stockService.searchItemsWithBatches(filter);
         return ResponseResource.success(HttpStatus.OK, response, "Stock fetched successfully");
     }
 

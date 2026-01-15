@@ -14,6 +14,7 @@ public class StockFilterDto {
     private String searchQuery;
     private String status;
     private Long customerId;
+    private Long itemId;
     private Long warehouseId;
     private Date fromDate;
     private Date toDate;
