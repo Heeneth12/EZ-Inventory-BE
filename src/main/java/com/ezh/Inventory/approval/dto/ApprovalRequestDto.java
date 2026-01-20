@@ -6,6 +6,7 @@ import com.ezh.Inventory.approval.entity.ApprovalType;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -23,5 +24,7 @@ public class ApprovalRequestDto {
     private BigDecimal valueAmount;
     private Long actionedBy;
     private String actionRemarks;
-    private String createdAt;
+    private Date approvedDate;
+    private Date createdAt;
+    private Date updatedAt;
 }

@@ -38,7 +38,8 @@ CREATE TABLE approval_request (
     description TEXT,
     value_amount DECIMAL(18, 2),
     actioned_by BIGINT,
-    action_remarks TEXT
+    action_remarks TEXT,
+    approved_date TIMESTAMP
 );
 
 -- Create indexes for approval_config

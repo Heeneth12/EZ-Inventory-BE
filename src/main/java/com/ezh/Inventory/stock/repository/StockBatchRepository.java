@@ -23,19 +23,21 @@ public interface StockBatchRepository extends JpaRepository<StockBatch, Long> {
     List<StockBatch> findAvailableBatches(Long itemId, Long warehouseId);
 
     @Query("SELECT sb.itemId as itemId, " +
-                "i.name as itemName, " +
-                "i.itemCode as itemCode, " +
-                "i.sku as itemSku, " +
-                "sb.batchNumber as batchNumber, " +
-                "sb.buyPrice as buyPrice, " +
-                "sb.remainingQty as remainingQty, " +
-                "sb.expiryDate as expiryDate " +
-                "FROM StockBatch sb " +
-                "JOIN Item i ON sb.itemId = i.id " +
-                "WHERE sb.warehouseId = :warehouseId " +
-                "AND sb.remainingQty > 0 " + // Only show batches with stock
-                "AND (LOWER(i.name) LIKE LOWER(CONCAT('%', :query, '%')) " +
-                "OR LOWER(i.itemCode) LIKE LOWER(CONCAT('%', :query, '%')))")
-    List<StockSearchProjection> searchStockWithBatches(@Param("warehouseId") Long warehouseId,
+            "i.name as itemName, " +
+            "i.itemCode as itemCode, " +
+            "i.sku as itemSku, " +
+            "sb.batchNumber as batchNumber, " +
+            "sb.buyPrice as buyPrice, " +
+            "sb.remainingQty as remainingQty, " +
+            "sb.expiryDate as expiryDate " +
+            "FROM StockBatch sb " +
+            "JOIN Item i ON sb.itemId = i.id " +
+            "WHERE sb.warehouseId = :warehouseId " +
+            "AND sb.remainingQty > 0 " +
+            "AND (:itemId IS NULL OR sb.itemId = :itemId) " +
+            "AND (:query IS NULL OR (LOWER(i.name) LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "OR LOWER(i.itemCode) LIKE LOWER(CONCAT('%', :query, '%')))) " +
+            "ORDER BY i.name ASC, sb.expiryDate ASC")
+    List<StockSearchProjection> searchStockWithBatches(@Param("warehouseId") Long warehouseId, @Param("itemId") Long itemId,
                                                        @Param("query") String query);
 }

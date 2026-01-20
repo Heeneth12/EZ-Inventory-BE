@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -177,10 +178,19 @@ public class StockServiceImpl implements StockService {
 
     @Override
     @Transactional
-    public List<ItemStockSearchDto> searchItemsWithBatches(String query, Long warehouseId) {
+    public List<ItemStockSearchDto> searchItemsWithBatches(StockFilterDto filter) {
 
-        // 1. Fetch Flat Data
-        List<StockSearchProjection> rawData = stockBatchRepository.searchStockWithBatches(warehouseId, query);
+        Long warehouseId = filter.getWarehouseId();
+        Long itemId = filter.getItemId();
+        String query = (filter.getSearchQuery() != null && !filter.getSearchQuery().isEmpty())
+                ? filter.getSearchQuery()
+                : null;
+
+        List<StockSearchProjection> rawData = stockBatchRepository.searchStockWithBatches(warehouseId, itemId, query);
+
+        if (rawData.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         // 2. Group by Item ID
         Map<Long, List<StockSearchProjection>> groupedData = rawData.stream()
@@ -224,6 +234,9 @@ public class StockServiceImpl implements StockService {
                 .closingQty(0)
                 .build();
     }
+
+
+
 
     @Override
     @Transactional(readOnly = true)

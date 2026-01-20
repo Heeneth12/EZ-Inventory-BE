@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -122,6 +123,7 @@ public class ApprovalService {
         request.setApprovalStatus(actionDto.getStatus()); // APPROVED or REJECTED
         request.setActionedBy(UserContextUtil.getUserId());
         request.setActionRemarks(actionDto.getRemarks());
+        request.setApprovedDate(new Date());
         approvalRequestRepository.save(request);
 
         // 2. Publish the Event instead of calling services directly
@@ -300,11 +302,9 @@ public class ApprovalService {
                 .valueAmount(entity.getValueAmount())
                 .actionedBy(entity.getActionedBy())
                 .actionRemarks(entity.getActionRemarks())
-                .createdAt(
-                        entity.getCreatedAt() != null
-                                ? entity.getCreatedAt().toString()
-                                : null
-                )
+                .approvedDate(entity.getApprovedDate())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 

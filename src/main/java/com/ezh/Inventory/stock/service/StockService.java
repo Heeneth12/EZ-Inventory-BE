@@ -13,7 +13,7 @@ public interface StockService {
     CommonResponse updateStock(StockUpdateDto stockUpdateDto);
     Page<StockDto> getCurrentStock(StockFilterDto filterDto, Integer page, Integer size);
     Page<StockLedgerDto> getStockTransactions(StockFilterDto filterDto, Integer page, Integer size);
-    List<ItemStockSearchDto> searchItemsWithBatches(String query, Long warehouseId);
+    List<ItemStockSearchDto> searchItemsWithBatches(StockFilterDto filterDto);
     StockDashboardDto getStockDashboard(Long warehouseId) throws CommonException;
 
 }
